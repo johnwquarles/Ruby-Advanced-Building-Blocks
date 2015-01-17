@@ -56,14 +56,14 @@ module Enumerable
     return true
   end
 
-  def my_count (find = "")
+  def my_count (find = nil)
     result = 0
+    return self.length unless (find || block_given?)
     for i in self
-      if block_given?
-        result += 1 if yield(i)
-      elsif find != ""
+      if find
         result += 1 if i == find
-      else return self.length
+      elsif block_given?
+        result += 1 if yield(i)
       end
     end
     return result
@@ -71,27 +71,20 @@ module Enumerable
   
   def my_map(proc = nil)
     new = []
-    if proc != nil
-      for i in self
-        new << proc.call(i)
-      end
-    else return self
-    end
-    return new
-  end
-  
-  def my_map2(proc = nil)
-     
-    result = []
+    
     for i in self
       if proc and block_given?
-        result << yield(proc.call(i))
+        new << yield(proc.call(i))
       elsif proc
-        result << proc.call(i)
-      else return self
+        new << proc.call(i)
+      elsif block_given?
+        new << yield(i)
+      else
+        return self
       end
     end
-    return result
+    
+    return new
   end
   
   def my_inject
